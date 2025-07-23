@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+{% extends "admin/change_list.html" %}
+
+{% block content %}
+<h2>User Charts</h2>
+
+<div>
+    <!-- Main City and Age Charts -->
+    <h3>City Distribution</h3>
+    <canvas id="cityChart" style="height: 200px; width: 100%;"></canvas>
+</div>
+
+<div class="mt-5" style="display: flex; justify-content: space-between; margin-bottom: 40px; height: 300px; width: 100%;">
+    <!-- City Doughnut Chart -->
+    <div style="flex: 1; padding-right: 5px; display: flex; justify-content: center; align-items: center; text-align: center;">
+        <div>
+            <h3>City Distribution</h3>
+            <canvas id="cityDoughnutChart"></canvas>
+        </div>
+    </div>
+    <!-- Age Doughnut Chart -->
+    <div style="flex: 1; padding-left: 5px; display: flex; justify-content: center; align-items: center; text-align: center;">
+        <div>
+            <h3>Age Distribution</h3>
+            <canvas id="ageDoughnutChart"></canvas>
+        </div>
+    </div>
+</div>
+
+
+<div>
+    <!-- Age Category Chart -->
+    <h3>Age Distribution</h3>
+    <canvas id="ageChart" style="height: 200px; width: 100%;"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Predefined colors for City Charts
+    var cityColors = [
+        'rgba(54, 162, 235, 0.6)', 'rgba(75, 192, 192, 0.6)', 'rgba(255, 206, 86, 0.6)', 'rgba(255, 99, 132, 0.6)', 
+        'rgba(153, 102, 255, 0.6)', 'rgba(255, 159, 64, 0.6)', 'rgba(199, 199, 199, 0.6)', 'rgba(83, 102, 255, 0.6)',
+        'rgba(255, 99, 132, 0.6)', 'rgba(100, 159, 64, 0.6)', 'rgba(155, 192, 192, 0.6)', 'rgba(55, 162, 235, 0.6)', 
+        'rgba(210, 88, 132, 0.6)', 'rgba(193, 109, 64, 0.6)', 'rgba(153, 220, 255, 0.6)', 'rgba(255, 170, 64, 0.6)',
+        'rgba(160, 120, 235, 0.6)', 'rgba(210, 99, 132, 0.6)', 'rgba(105, 102, 255, 0.6)', 'rgba(190, 206, 86, 0.6)', 
+        'rgba(135, 159, 64, 0.6)', 'rgba(155, 255, 192, 0.6)', 'rgba(185, 162, 235, 0.6)', 'rgba(120, 159, 64, 0.6)',
+        'rgba(145, 99, 132, 0.6)', 'rgba(205, 192, 192, 0.6)', 'rgba(125, 162, 235, 0.6)', 'rgba(255, 162, 132, 0.6)',
+        'rgba(125, 102, 255, 0.6)', 'rgba(175, 159, 64, 0.6)', 'rgba(205, 206, 86, 0.6)', 'rgba(225, 255, 132, 0.6)', 
+        'rgba(140, 102, 255, 0.6)', 'rgba(145, 162, 235, 0.6)', 'rgba(175, 102, 64, 0.6)', 'rgba(245, 199, 192, 0.6)',
+        'rgba(215, 162, 235, 0.6)', 'rgba(85, 192, 64, 0.6)', 'rgba(155, 99, 132, 0.6)', 'rgba(105, 255, 64, 0.6)', 
+        'rgba(195, 102, 192, 0.6)', 'rgba(255, 255, 132, 0.6)', 'rgba(155, 102, 235, 0.6)', 'rgba(85, 206, 64, 0.6)',
+        'rgba(205, 159, 64, 0.6)', 'rgba(125, 255, 192, 0.6)', 'rgba(165, 192, 86, 0.6)', 'rgba(255, 255, 86, 0.6)',
+        'rgba(255, 162, 192, 0.6)', 'rgba(100, 192, 64, 0.6)', 'rgba(235, 159, 64, 0.6)', 'rgba(155, 255, 192, 0.6)', 
+        'rgba(105, 99, 132, 0.6)', 'rgba(195, 192, 64, 0.6)', 'rgba(225, 255, 132, 0.6)', 'rgba(175, 255, 132, 0.6)',
+        'rgba(145, 159, 64, 0.6)', 'rgba(155, 192, 192, 0.6)'
+    ];
+
+    // City Chart
+    var ctxCity = document.getElementById('cityChart').getContext('2d');
+    new Chart(ctxCity, {
+        type: 'bar',
+        data: {
+            labels: {{ chart_data.city_chart_labels|safe }},
+            datasets: [{
+                label: 'Users per City',
+                data: {{ chart_data.city_chart_values|safe }},
+                backgroundColor: cityColors, // Use predefined city colors
+                borderColor: cityColors.map(color => color.replace('0.6', '1')),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // City Doughnut Chart
+    var ctxCityDoughnut = document.getElementById('cityDoughnutChart').getContext('2d');
+    new Chart(ctxCityDoughnut, {
+        type: 'doughnut',
+        data: {
+            labels: {{ chart_data.city_chart_labels|safe }},
+            datasets: [{
+                label: 'Users per City',
+                data: {{ chart_data.city_chart_values|safe }},
+                backgroundColor: cityColors, // Use predefined city colors
+                borderColor: cityColors.map(color => color.replace('0.6', '1')),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            }
+        }
+    });
+
+    // Predefined colors for Age Charts
+    var ageColors = [
+        'rgba(54, 162, 235, 0.2)', // 18-25
+        'rgba(75, 192, 192, 0.2)', // 25-35
+        'rgba(255, 206, 86, 0.2)', // 35-45
+        'rgba(255, 99, 132, 0.2)', // 45-55
+        'rgba(153, 102, 255, 0.2)'  // 55+
+    ];
+
+    // Age Chart
+    var ctxAge = document.getElementById('ageChart').getContext('2d');
+    new Chart(ctxAge, {
+        type: 'bar',
+        data: {
+            labels: {{ chart_data.age_chart_labels|safe }},
+            datasets: [{
+                label: 'Users by Age Category',
+                data: {{ chart_data.age_chart_values|safe }},
+                backgroundColor: ageColors, // Use predefined age colors
+                borderColor: ageColors.map(color => color.replace('0.2', '1')),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Age Doughnut Chart
+    var ctxAgeDoughnut = document.getElementById('ageDoughnutChart').getContext('2d');
+    new Chart(ctxAgeDoughnut, {
+        type: 'doughnut',
+        data: {
+            labels: {{ chart_data.age_chart_labels|safe }},
+            datasets: [{
+                label: 'Users by Age Category',
+                data: {{ chart_data.age_chart_values|safe }},
+                backgroundColor: ageColors, // Use predefined age colors
+                borderColor: ageColors.map(color => color.replace('0.2', '1')),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            }
+        }
+    });
+</script>
+
+
+
+{{ block.super }}
+{% endblock %}

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+{% extends "_base.html" %} 
+{% load static %} 
+{% block title %}STITMARI{%endblock title %} 
+{% block content %}
+<div class="container">
+  <body>
+    <div class="container mt-5">
+        <div class="border p-4 bg-light rounded">
+            <h2 class="text-secondary">Confirmation de votre commande</h2>
+            <div class="mt-4">
+                <h4 class="badge badge-warning p-2">Commande en attente de paiement</h4>
+                <p>Votre commande a bien été prise en compte.</p>
+                <p>Un récapitulatif de votre commande vous a été envoyé sur votre adresse e-mail.</p>
+                <hr>
+                <p class="mb-0"><strong>Paiement en espèce via Cash Plus</strong></p>
+                <p>Présentez-vous à l'agence Cash Plus la plus proche de chez vous, pour effectuer le paiement de la somme de <strong>250,00 MAD</strong>.</p>
+                <p>Veuillez prendre note du numéro de paiement Cash Plus : 
+                    <span ><strong>cp702943733</strong></span>
+                </p>
+                <p class="text-danger font-weight-bold">Attention, votre commande ne sera validée que lorsque votre paiement sera effectif dans un délai de 48h.</p>
+            </div>
+            <div class="d-flex justify-content-between mt-4">
+                <a href="/" class="btn btn-primary ">CONTINUER MES ACHATS</a>
+                <a href="" class="btn btn-primary ">VOIR MES COMMANDES</a>
+            </div>
+        </div>
+    </div>
+  </body>
+</div>
+{% endblock content %}

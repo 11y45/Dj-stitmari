@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+{% extends "_base.html" %}
+{% load static %}
+{% load humanize %} 
+{% block title %}STITMARI{% endblock title %}
+{% block content %}
+
+
+
+<!-- Wallet Balance Smaller Card -->
+<div class="container">
+  {% if messages %}
+  {% for message in messages %}
+    {% if 'transaction' in message.tags %}
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        {{ message }}
+      </div>
+    {% endif %}
+  {% endfor %}
+  {% endif %}
+    <div class="card my-4 shadow-sm text-center" style="max-width: 65%; margin: auto;">
+      <div class="card-header">
+        <h2>Balance</h2>
+      </div>
+      <div class="card-body">
+        <p style="font-size: 1.5rem;">Your current balance is: <strong class="text-success">{{ wallet.balance |intcomma }} DH</strong></p>
+      </div>
+      <div class="card-footer d-flex justify-content-center flex-wrap">
+        <a href="{% url 'deposit_funds' %}" class="btn btn-primary mx-2 my-1 col-12 col-sm-auto">Deposit Funds</a>
+        <a href="{% url 'withdraw_funds'%}" class="btn btn-primary mx-2 my-1 col-12 col-sm-auto">Withdraw Funds</a>
+        <a href="/#Projects" class="btn btn-primary mx-2 my-1 col-12 col-sm-auto">Invest Project</a>
+      </div>
+    </div>
+  </div>
+
+<!-- Investment Dashboard with Chart  -->
+<div class="container-fluid px-4">
+  <div class="row mb-3">
+    <div class="col-lg-7 ">
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <h2>Investment Dashboard</h2>
+        </div>
+        <div class="card-body">
+          {% if inv_transactions %}
+          <div class="table-responsive">
+            <table class="table">
+              <thead class="thead-light">
+                <tr>
+                  <th>Invest Date</th>
+                  <th>Project</th>    
+                  <th>Amount</th>
+                  <th>Profit</th>
+                  <th>Holding Period</th>
+                  <th>End Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for transaction in inv_transactions %}
+                <tr>
+                  <td>{{ transaction.time }}</td>
+                  <td>{{ transaction.project.name }}</td>
+                  <td>{{ transaction.amount }} DH</td>
+                  <td>{{ transaction.project.profit }} %</td>
+                  <td>{{ transaction.project.Holding_periode }} month</td>
+                  <td>{{ transaction.project.end_date_prj }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <p>No investment transactions found.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <canvas id="investmentChart"></canvas>
+    </div>    
+  </div>
+</div>
+
+<!-- Transaction History with Chart  -->
+<div class="container-fluid px-4">
+  <div class="row mb-2">
+    <div class="col-lg-7">
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <h2>Transaction History</h2>
+        </div>
+        <div class="card-body">
+          {% if transactions %}
+          <div class="table-responsive">
+            <table class="table">
+              <thead class="thead-light">
+                <tr>
+                  <th>Amount</th>
+                  <th>Type</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="transaction-body">
+                {% for transaction in transactions %}
+                <tr class="transaction-row" style="display: none;">
+                  <td>{{ transaction.amount }} DH</td>
+                  <td>
+                    {% if transaction.transaction_type %}
+                    {{ transaction.get_transaction_type_display }}
+                    {% else %}
+                    Investment
+                    {% endif %}
+                  </td>
+                  <td>{{ transaction.time }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="text-center">
+            <button id="loadMore" class="btn btn-primary">Load More</button>
+          </div>
+          {% else %}
+          <p>No transactions found.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <canvas id="transactionChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+
+  // Categories doughnut charts
+  var ctx1 = document.getElementById('investmentChart').getContext('2d');
+  var investmentChartData = JSON.parse('{{ investment_chart_data|escapejs }}');
+  var investmentChart = new Chart(ctx1, {
+    type: 'doughnut',
+    data: {
+      labels: investmentChartData.labels,
+      datasets: [{
+        label: 'Investment Distribution',
+        data: investmentChartData.data,
+        backgroundColor: ['#2196F3' , '#4CAF50', '#FF9800', '#F44336'  ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false
+    }
+  });
+
+  // Deposit Withrawl Bar Chart
+  var ctx2 = document.getElementById('transactionChart').getContext('2d');
+  var transactionChartData = JSON.parse('{{ transaction_chart_data|escapejs }}');
+  var transactionChart = new Chart(ctx2, {
+    type: 'bar',
+    data: {
+      labels: transactionChartData.labels,
+      datasets: [{
+        label: 'Deposits',
+        data: transactionChartData.deposits,
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
+      }, {
+        label: 'Withdrawals',
+        data: transactionChartData.withdrawals,
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+    // Show 5 by 5
+  document.addEventListener("DOMContentLoaded", function() {
+    let transactionRows = document.querySelectorAll(".transaction-row");
+    let loadMoreButton = document.getElementById("loadMore");
+
+    let itemsToShow = 5;
+    let itemsDisplayed = 0;
+
+    function showItems() {
+      for (let i = itemsDisplayed; i < itemsDisplayed + itemsToShow; i++) {
+        if (transactionRows[i]) {
+          transactionRows[i].style.display = "table-row";
+        } else {
+          loadMoreButton.style.display = "none";
+          break;
+        }
+      }
+      itemsDisplayed += itemsToShow;
+    }
+
+    loadMoreButton.addEventListener("click", showItems);
+
+    // Initially display the first 5 items
+    showItems();
+  });
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+{% extends "_base.html" %}
+{% load static %}
+{% load humanize %}
+{% block title %}STITMARI{% endblock title %}
+{% block content %}
+
+<section id="Header" class="container-fluid text-white" style="background-color: #1F3B73;">
+    <div class="container">
+        <div class="row align-items-end">
+            <div class="col-md-6 py-5">
+                <div class="row">
+                    <div class="col-12 mb-4 header-section align-items-center text-center ">
+                        <h5 class="font-weight-bold " style ="font-size: 2.5rem; margin-bottom: 1rem;">Invest in Real Estate <br> from 100 dh</h5>
+                        <p style ="font-size: 1.5rem;" >Will launch soon on</p>
+
+                        <img src="{% static 'images/app-store.png' %}" alt="App Store" class="img-fluid mr-2 mb-2" style="max-width: 150px;">
+                        <img src="{% static 'images/google-play.png' %}" alt="Google Play" class="img-fluid mr-2 mb-2"  style="max-width: 150px;">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 d-none d-md-block">
+                <div class="d-flex align-items-end h-100">
+                    <img src="{% static 'images/Immeuble.png' %}" class="img-fluid" alt="Immeuble">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+    
+<section id="About" class="d-flex align-items-center" >
+    <div class="container" style="max-width: 1100px;">
+        <div class="row" style="background: url('{% static 'images/m_pattern_solo.svg' %}') no-repeat center right;background-size: 30% auto; padding: 50px 0;">
+            <div class="col-md-6  p-4" >
+                <h2 class="font-weight-bold" style="color:navy;">STITMARI</h2>
+                <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper</p>
+                <a href="/about" class="btn btn-primary">Read More</a>
+            </div>
+            <div class="col-md-6  p-4">
+                <h2 class="font-weight-bold" style="color:navy;">How To Invest ?</h2>
+                <ul class="list-unstyled">
+                    <li>Sign up as an investor</li>
+                    <li>Charge your wallet</li>
+                    <li>Look for an investment opportunity</li>
+                    <li>Accept terms and conditions</li>
+                    <li>Track progress through your control panel.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="Projects">
+    <div class="container-sm bg-light pt-3 mb-5" style=" border-radius: 20px;" >
+        <div class="row row-cols-1 row-cols-md-1 row-cols-lg-2 row-cols-xl-3 g-4">
+            {% for project in project_list|slice:":3" %}
+            <div class="col mb-4 project-card">
+                <a href="{{ project.get_absolute_url }}" class="text-decoration-none">
+                <div class="card h-100 shadow-sm">
+                    <div class="position-relative">
+                        {% if project.images.first %}
+                            <img class="card-img-top" src="{{ project.images.first.image.url }}" alt="Project image" style="height: 250px; border-top-left-radius: 5px; border-top-right-radius: 5px;">
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold" style="color:navy;"><strong>{{ project.name }}</strong></h5>
+                        <div class="d-flex flex-wrap mb-2">
+                            <h5><span class="badge bg-light text-secondary me-2">{{ project.location }}</span></h5>
+                            <h5><span class="badge bg-light text-secondary me-2">{{ project.type }}</span></h5>
+                            <h5><span class="badge bg-light text-secondary ">{{ project.profit }}%</span></h5>
+                        </div>
+                        <p class="card-text text-muted">
+                            Coverage: <span class="text-success"><strong>{{ project.total_amount|intcomma}} DH </strong></span><br>
+                            Progress: <span class="text-success"><strong>{{ project.coverage_percentage }}%</strong></span>
+                            <div class="progress">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ project.coverage_percentage }}%" aria-valuenow="{{ project.coverage_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </p>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        <p class="card-text text-muted">Minimum:<span class="text-success fw-bolder "> <strong>{{ project.min_investment }} DH </strong></span></p>
+                        <a href="{{ project.get_absolute_url }}" class="btn btn-primary text-end" style="z-index: 2;">Details</a>
+                    </div>
+                    {% if project.is_completed %}
+                        <!-- Sky Blue Overlay -->
+                        <div class="position-absolute w-100 h-100" style="background-color: skyblue; opacity: 0.5; top: 0; left: 0;"></div>
+                        <img src="{% static 'images/Completed_Fr.png' %}" alt="Completed" class="position-absolute " style="max-width: 80%; opacity: 1; top:10%;right:10% ">
+                    {% endif %}
+                </div>
+                </a>
+            </div>
+            {% endfor %}
+
+            {% for project in project_list|slice:"3:" %}
+            <div class="col mb-4 project-card d-none">
+                <div class="card h-100 shadow-sm" >
+                    <div class="position-relative">
+                        {% if project.images.first %}
+                        <img class="card-img-top" src="{{ project.images.first.image.url }}" alt="Project image" style="height: 250px; border-top-left-radius: 5px; border-top-right-radius: 5px;">
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold" style="color:navy;"><strong>{{ project.name }}</strong></h5>
+                        <div class="d-flex flex-wrap mb-2">
+                            <h5><span class="badge bg-light text-secondary me-2">{{ project.location }}</span></h5>
+                            <h5><span class="badge bg-light text-secondary me-2">{{ project.type }}</span></h5>
+                            <h5><span class="badge bg-light text-secondary ">{{ project.profit }}%</span></h5>
+                        </div>
+                        <p class="card-text text-muted">
+                            Coverage: <span class="text-success"><strong>{{ project.total_amount }} DH </strong></span><br>
+                            Progress: <span class="text-success"><strong>{{ project.coverage_percentage }}%</strong></span>
+                            <div class="progress">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ project.coverage_percentage }}%" aria-valuenow="{{ project.coverage_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </p>
+                        <div class="card-footer d-flex justify-content-between align-items-center" >
+                            <p class="card-text text-muted">Minimum:<span class="text-success fw-bolder"> <strong>{{ project.min_investment }} DH </strong></span></p>
+                            <a href="{{ project.get_absolute_url }}" class="btn btn-primary text-end" style="z-index: 2;">Details</a>
+                        </div>
+                        {% if project.is_completed %}
+                            <!-- Sky Blue Overlay -->
+                            <div class="position-absolute w-100 h-100" style="background-color: skyblue; opacity: 0.5; top: 0; left: 0;"></div>
+                            <img src="{% static 'images/Completed_Fr.png' %}" alt="Completed" class="position-absolute " style="max-width: 80%; opacity: 1; top:10%;right:10% ">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center">
+            <button id="displayMoreBtn" class="btn btn-primary mb-3">Show More</button>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var hiddenProjects = document.querySelectorAll('.project-card.d-none');
+        var displayMoreBtn = document.getElementById('displayMoreBtn');
+
+        // Hide the button if there are no hidden projects
+        if (hiddenProjects.length === 0) {
+            displayMoreBtn.style.display = 'none';
+        }
+
+        displayMoreBtn.addEventListener('click', function() {
+            var hiddenProjects = document.querySelectorAll('.project-card.d-none');
+            for (var i = 0; i < 3 && i < hiddenProjects.length; i++) {
+                hiddenProjects[i].classList.remove('d-none');
+            }
+            if (document.querySelectorAll('.project-card.d-none').length === 0) {
+                this.style.display = 'none';
+            }
+        });
+    });
+</script>
+
+{% endblock content %}

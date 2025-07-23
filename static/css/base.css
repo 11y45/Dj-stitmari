@@ -1,0 +1,45 @@
+html, body {
+    height: 100vh;
+    margin: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+  }
+
+body {
+    font-family: Arial;
+    padding-top: 80px; /* Daroruy tzidha ila derti navbar stick to top while scrolling*/
+}
+
+
+.navbar-nav .nav-link {
+    color: navy !important; /* Navy blue color for the links */
+}
+
+/* Custom color for active link */
+.navbar-nav .nav-item.active .nav-link,
+.navbar-nav .nav-item:hover .nav-link {
+    color: #87ceeb!important; /* Sky blue color when the link is active or hovered */
+}
+
+.content {
+    flex: 1;
+}
+
+
+.footer a.text-white:hover {
+    color: #87ceeb!important;
+}
+
+
+.wrapper {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+}
+
+      
+  
+
+    

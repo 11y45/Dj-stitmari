@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+{% extends "_base.html" %} 
+{% load static %}
+{% load humanize %} 
+{% block title%} {{ project.name }} {% endblock title %} 
+{% block content %}
+<!-- Start of CSS Styles -->
+<style>
+  .background-image {
+    background: url("{% static "images/One_pattern.svg" %}") no-repeat top -50px
+        left -50px,
+      url("{% static "images/One_pattern.svg" %}") no-repeat bottom -50px right -50px;
+    background-size: 15% auto;
+  }
+
+  @media (max-width: 768px) {
+    .background-image {
+      background: none; /* This will remove the background image */
+    }
+  }
+
+  .carousel-item img {
+    height: 400px; /* Adjust height as needed */
+    width: 100%;
+    object-fit: contain;
+  }
+
+  .carousel-indicators {
+    display: flex;
+    justify-content: center;
+    bottom: -50px;
+  }
+
+  .carousel-indicators li {
+    display: inline-block;
+    margin: 0px 30px; /* Adjust spacing as needed */
+  }
+
+  .carousel-indicators img {
+    width: 70px;
+    display: block;
+    cursor: pointer;
+  }
+
+  .carousel-indicators .active img {
+    border: 2px solid navy;
+  }
+
+  .carousel-indicators button {
+    display: inline-block;
+    width: auto;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  /* Custom styles for dark carousel controls */
+  .carousel-control-prev,
+  .carousel-control-next {
+    filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg)
+      brightness(100%) contrast(100%);
+  }
+
+  #map {
+            height: 410px; /* Adjust the height as needed */
+            width:  100%;
+        }
+</style>
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<!-- End of CSS Styles -->
+
+<div class="background-image">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12 col-md-7 col-xl-6 my-5 pb-4">
+        <!-- Start of Carousel -->
+        <div
+          class="carousel carousel-dark slide"
+          id="projectCarousel"
+          data-ride="carousel"
+        >
+          <!-- Start of Carousel Indicators -->
+          <ol class="carousel-indicators">
+            {% for image in project.images.all %}
+            <li
+              data-target="#projectCarousel"
+              data-slide-to="{{ forloop.counter0 }}"
+              class="{% if forloop.first %}active{% endif %}"
+            >
+              <img
+                src="{{ image.image.url }}"
+                style="height: 50px; object-fit: cover;"
+              />
+            </li>
+            {% endfor %}
+          </ol>
+          <!-- End of Carousel Indicators -->
+
+          <!-- Start of Carousel Items -->
+          <div
+            class="carousel-inner bg-light py-3 px-3"
+            style="border-radius: 20px"
+          >
+            {% for image in project.images.all %}
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+              <img
+                src="{{ image.image.url }}"
+                class="d-block w-100"
+                alt="..."
+                style="height: 400px; object-fit: fill;border-radius:8px;"
+              />
+            </div>
+            {% endfor %}
+          </div>
+          <!-- End of Carousel Items -->
+
+          <!-- Start of Carousel Controls -->
+          <a
+            class="carousel-control-prev"
+            href="#projectCarousel"
+            role="button"
+            data-slide="prev"
+          >
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+          </a>
+          <a
+            class="carousel-control-next"
+            href="#projectCarousel"
+            role="button"
+            data-slide="next"
+          >
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+          </a>
+          <!-- End of Carousel Controls -->
+        </div>
+        <!-- End of Carousel -->
+      </div>
+
+      <div class="col-sm-12 col-md-5 col-xl-6 my-5">
+        <!-- Start of Project Information -->
+        <h2 class="fw-bold text-center" style="navy">
+          <strong>{{ project.name }}</strong>
+        </h2>
+        <p class="text-muted">Manager :</p>
+        <h4 class="text-center">{{ project.manager }}</h4>
+        <p class="text-muted">Total Amount :</p>
+        <h4 class="text-center fw-bold">
+          {{ project.total_amount|intcomma }} DH
+        </h4>
+
+        <div class="row">
+          <div class="col-6">
+            <p class="text-muted">
+              Min Investment:<br />
+              <strong class="text-dark">{{ project.min_investment }} DH</strong>
+            </p>
+            <p class="text-muted">
+              Holding Period:<br />
+              <strong class="text-dark"
+                >{{ project.Holding_periode }} month</strong
+              >
+            </p>
+          </div>
+          <div class="col-6">
+            <p class="text-muted">
+              Profit:<br />
+              <strong class="text-dark">{{ project.profit }} %</strong>
+            </p>
+            <p class="text-muted">
+              Last Date For Investment:<br />
+              <strong class="text-dark">{{ project.end_date_inv }}</strong>
+            </p>
+          </div>
+        </div>
+
+        <p class="text-muted">Coverage Percentage:</p>
+        <div class="progress">
+          <div
+            class="progress-bar bg-success"
+            role="progressbar"
+            style="width: {{ project.coverage_percentage }}%;"
+            aria-valuenow="{{ project.coverage_percentage }}"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          >
+            {{ project.coverage_percentage }}%
+          </div>
+        </div>
+        <!--End of Project Information-->
+
+        <!-- Start of Modal Trigger Button-->
+        {% if project.is_completed %}
+          <button type="button" class="btn btn-primary btn-lg btn-block mt-3 disabled">
+            Project Completed 
+          </button>
+          {% else %} 
+          <a href="{% url 'investment' project.pk %}" type="button" class="btn btn-primary btn-lg btn-block mt-3" >
+            Invest 
+          </a>
+        {% endif %}      
+        <!--End of Modal Trigger Button-->
+
+        <!-- Start of Modal -->
+        <div
+          class="modal fade"
+          id="exampleModal"
+          tabindex="-1"
+          aria-labelledby="exampleModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <!-- Modal Header -->
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">
+                  Choose payment method
+                </h5>
+                <button
+                  type="button"
+                  class="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+
+              <!-- Start of Modal Body -->
+              <div class="modal-body">
+                <!-- Wallet Option -->
+                <div
+                  id="wallet-option"
+                  class="custom-border p-3 mb-3 d-flex justify-content-between align-items-center"
+                  onclick="selectOption('walletRadio', 'wallet-option')"
+                >
+                  <h5 class="d-inline">Wallet :</h5>
+                  <span class="text-success d-block"
+                    ><strong>Balance : {{ wallet.balance }} DH</strong></span
+                  >
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="paymentOption"
+                      id="walletRadio"
+                      value="wallet"
+                    />
+                    <label class="form-check-label" for="walletRadio"></label>
+                  </div>
+                </div>
+
+                <!-- Cash Plus Option -->
+                <div
+                  id="cash-plus-option"
+                  class="custom-border p-3 mb-3 d-flex justify-content-between align-items-center"
+                  onclick="selectOption('cashPlusRadio', 'cash-plus-option')"
+                >
+                  <h5 class="d-inline">Cash Plus :</h5>
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="paymentOption"
+                      id="cashPlusRadio"
+                      value="cashplus"
+                    />
+                    <label class="form-check-label" for="cashPlusRadio"></label>
+                  </div>
+                </div>
+              </div>
+              <!-- End of Modal Body -->
+
+              <!-- Modal Footer -->
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-dismiss="modal"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-primary btn-lg"
+                  onclick="redirectBasedOnSelection()"
+                >
+                  Choose
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End of Modal -->
+      </div>
+    </div>
+
+    <!-- Start of Additional Information Sections -->
+    <div class="row mt-3 mb-3">
+      <div class="col-sm-12 col-md-6 col-xl-6">
+        <!-- Start of Description Section -->
+        <div id="accordionOne" role="tablist">
+          <div class="card mb-3">
+            <div class="card-header" role="tab" id="headingOne">
+              <h5 class="mb-0">
+                <a
+                  class="collapsed text-dark"
+                  data-toggle="collapse"
+                  href="#collapseOne"
+                  aria-expanded="false"
+                  aria-controls="collapseOne"
+                >
+                  Description
+                </a>
+              </h5>
+            </div>
+            <div
+              id="collapseOne"
+              class="collapse-show"
+              role="tabpanel"
+              aria-labelledby="headingOne"
+            >
+              <div class="card-body">{{ project.description |linebreaksbr}} </div>
+            </div>
+          </div>
+        </div>
+        <!-- End of Description Section -->
+        
+        <!-- Start of Document Section -->
+        <div class="card mb-3">
+          <div class="card-header" role="tab" id="headingTwo">
+            <h5 class="mb-0">
+              <a class="collapsed text-dark" data-toggle="collapse" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                  Document
+              </a>
+            </h5>
+          </div>
+          <div id="collapseTwo" class="collapse" role="tabpanel" aria-labelledby="headingTwo">
+            <div class="card-body">
+              <p>Project Associated Files:</p>
+                {% if project.documents.exists %}
+                  <a href="{{ project.documents.first.document.url }}" class="btn btn-info" download>
+                  Project file
+                  </a>
+                {% else %}
+                  <p>No files available for this project.</p>
+                {% endif %}
+            </div>
+          </div>
+        </div>
+        <!-- End of Document Section -->
+      </div>
+
+      <div class="col-sm-12 col-md-6 col-xl-6">
+
+        <!-- Start of Location Section -->
+        <div class="card mb-3">
+            <div class="card-header" role="tab" id="headingMap">
+              <h5 class="mb-0">
+                <a
+                  class="collapsed text-dark"
+                  data-toggle="collapse"
+                  href="#collapseMap"
+                  aria-expanded="false"
+                  aria-controls="collapseMap"
+                >
+                  Location 
+                </a>
+              </h5>
+            </div>
+            <div
+              id="collapseMap"
+              class="collapse"
+              role="tabpanel"
+              aria-labelledby="headingMap"
+            >
+              <div class="card-body">
+                <div id="map"></div>
+              <br />
+              </div>
+            </div>
+        </div>
+        <!-- End of Location Section -->
+               
+        <!-- Start of Updates Section -->
+        <div class="card mb-3">
+            <div class="card-header" role="tab" id="headingThree">
+              <h5 class="mb-0">
+                <a
+                  class="collapsed text-dark"
+                  data-toggle="collapse"
+                  href="#collapseThree"
+                  aria-expanded="false"
+                  aria-controls="collapseThree"
+                >
+                  Updates
+                </a>
+              </h5>
+            </div>
+            <div
+              id="collapseThree"
+              class="collapse"
+              role="tabpanel"
+              aria-labelledby="headingThree"
+            >
+              <div class="card-body">{{ project.updates }}</div>
+            </div>
+        </div>
+        <!-- End of Updates Section -->
+      </div>
+    </div>
+    <!-- End of Additional Information Sections -->
+  </div>
+  <!-- /.container -->
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+  // Function to initialize the map
+  document.addEventListener('DOMContentLoaded', function () {
+    $('#collapseMap').on('shown.bs.collapse', function () {
+        if (!$('#map').data('initialized')) {
+            var map = L.map('map').setView([{{ project.map_center.latitude }}, {{ project.map_center.longitude }}], 17);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              minZoom: 10, // Minimum zoom level for tiles
+              maxZoom: 17, // Maximum zoom level for tiles
+            }).addTo(map);
+
+            // Add the marker
+            L.marker([{{ project.map_center.latitude }}, {{ project.map_center.longitude }}]).addTo(map)
+                .bindPopup('{{ project.name }}')
+                .openPopup();
+
+            // Define the bounds for the polygon using JSON data
+            var latlngs = [
+                {% for corner in project.polygon_corners %}
+                    [{{ corner.latitude }}, {{ corner.longitude }}],
+                {% endfor %}
+            ];
+
+            // Create and add the polygon to the map
+            L.polygon(latlngs, {color: '#57504d', weight: 2, fillOpacity: 0.3}).addTo(map);
+
+            $('#map').data('initialized', true);
+        }
+    });
+  });
+</script>
+
+{% endblock content %}

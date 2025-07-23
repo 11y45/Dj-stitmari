@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+{% extends "admin/change_list.html" %}
+
+{% block content %}
+<h2>Investment, Deposit, and Withdrawal Transactions</h2>
+<div>
+    <canvas id="mergedChart" style="height: 300px; width: 100%;"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var ctxMerged = document.getElementById('mergedChart').getContext('2d');
+    var mergedChart = new Chart(ctxMerged, {
+        type: 'line',  // Keep type as 'line'
+        data: {
+            labels: {{ chart_data.days|safe }},
+            datasets: [
+                {
+                    label: 'Investments',
+                    data: {{ chart_data.totals_investment|safe }},
+                    borderColor: 'rgba(75, 192, 192, 1)',  // Cyan
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 1,
+                    fill: true  // Enable filling under the line to create an area chart
+                },
+                {
+                    label: 'Deposits',
+                    data: {{ chart_data.totals_deposit|safe }},
+                    borderColor: 'rgba(54, 162, 235, 1)',  // Blue
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderWidth: 1,
+                    fill: true  // Enable filling under the line to create an area chart
+                },
+                {
+                    label: 'Withdrawals',
+                    data: {{ chart_data.totals_withdrawal|safe }},
+                    borderColor: 'rgba(255, 99, 132, 1)',  // Red
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderWidth: 1,
+                    fill: true  // Enable filling under the line to create an area chart
+                }
+            ]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
+{{ block.super }}
+{% endblock %}

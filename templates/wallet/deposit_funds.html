@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+{% extends "_base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}STITMARI{% endblock title %}
+
+{% block content %}
+<style>
+
+  .custom-container {
+    max-width: 700px;
+    margin: auto;
+    padding: 2rem;
+  }
+
+</style>
+
+
+
+  <!-- Display Bootstrap Alerts for Messages -->
+  {% if messages %}
+  {% for message in messages %}
+    {% if 'transaction' in message.tags %}
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        {{ message }}
+      </div>
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+
+<div class="custom-container">
+  <div class="card shadow p-4">
+    <h1 class="display-4 mb-3">Select the amount</h1>
+  <!-- Deposit Form -->
+    <form method="post">
+      {% csrf_token %}
+      {{ form|crispy }}
+      <button class="btn btn-success d-flex mx-auto" type="submit">Deposit</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

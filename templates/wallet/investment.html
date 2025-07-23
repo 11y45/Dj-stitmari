@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+{% extends "_base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load humanize %}
+{% block title %}STITMARI{% endblock title %}
+{% block content %}
+<style>
+    .custom-border {
+    border: 1px solid #29bc84; /* Default border */
+    border-radius: 5px; /* Optional for rounded corners */
+    transition: border 0.3s ease; /* Smooth transition for border changes */
+  }
+
+  .custom-border.selected {
+    border: 6px solid #29bc84; /* Border when selected */
+  }
+  .custom-container {
+    max-width: 700px;
+    margin: auto;
+    padding: 2rem;
+  }
+</style>
+
+<div class="custom-container">
+  <div class="card shadow p-4">
+    <h1 class="display-4 mb-3">Invest in {{ project.name }}</h1>
+    <p class="lead">Secure your future by investing in this promising real estate opportunity.</p>
+    
+    <form method="post">
+      {% csrf_token %}
+      {{ form|crispy }}
+      <small class="form-text text-muted">
+        Left to invest: {{ remaining_investable_amount }} dh
+      </small>
+      <button type="button" class="btn btn-success btn-lg d-flex mx-auto" data-toggle="modal" data-target="#exampleModal">
+        Invest Now
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- The modal and script code remains similar, but you might want to consider improving them based on the suggestions. -->
+
+
+<!-- Start of Modal -->
+<div
+  class="modal fade"
+  id="exampleModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">
+          Choose payment method
+        </h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <!-- Start of Modal Body -->
+      <div class="modal-body">
+
+        <!-- Wallet Option -->
+        <div
+          id="wallet-option"
+          class="custom-border p-3 mb-3 d-flex justify-content-between align-items-center"
+          onclick="selectOption('walletRadio', 'wallet-option')">
+          <h5 class="d-inline">Wallet :</h5>
+          <span class="text-success d-block">
+            <strong>Balance : {{ wallet.balance | intcomma}} DH</strong>
+          </span>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="paymentOption"
+              id="walletRadio"
+              value="wallet"
+            />
+            <label class="form-check-label" for="walletRadio"></label>
+          </div>
+        </div>
+
+        <!-- Cash Plus Option -->
+        <div
+          id="cash-plus-option"
+          class="custom-border p-3 mb-3 d-flex justify-content-between align-items-center"
+          onclick="selectOption('cashPlusRadio', 'cash-plus-option')">
+          <h5 class="d-inline">Cash Plus :</h5>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="paymentOption"
+              id="cashPlusRadio"
+              value="cashplus"
+            />
+            <label class="form-check-label" for="cashPlusRadio"></label>
+          </div>
+        </div>
+        
+      </div>
+      <!-- End of Modal Body -->
+
+      <!-- Modal Footer -->
+      <div class="modal-footer text-center">
+        <button
+          type="button"
+          class="btn btn-primary btn-lg mx-auto"
+          onclick="redirectBasedOnSelection()"
+        >
+          Choose
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- End of Modal -->
+
+
+<script>
+  function selectOption(radioId, optionId) {
+    // Remove 'selected' class from all options
+    document.querySelectorAll(".custom-border").forEach(function (element) {
+      element.classList.remove("selected");
+    });
+    // Add 'selected' class to the selected option
+    document.getElementById(optionId).classList.add("selected");
+    // Check the corresponding radio button
+    document.getElementById(radioId).checked = true;
+  }
+ 
+  function redirectBasedOnSelection() {
+    // Get selected radio button
+    const selectedRadio = document.querySelector('input[name="paymentOption"]:checked');
+    const form = document.querySelector('form'); // Reference the form element
+
+    if (selectedRadio) {
+        if (selectedRadio.value === "wallet") {
+            form.submit(); // Submit the form if the wallet option is selected
+        } else if (selectedRadio.value === "cashplus") {
+            window.location.href = "{% url 'cashplus' %}";
+        }
+    } else {
+        alert("Please select an option.");
+    }
+  }
+</script>
+{% endblock %}
