@@ -4,8 +4,6 @@
 
 STITMARI is a web platform project focused on real-estate investment in Morocco. It brings project information, user accounts, wallet-related pages and investment activity together in one website.
 
-![STITMARI homepage](docs/screenshots/01-homepage.png)
-
 ---
 
 ## Contents
@@ -71,4 +69,4 @@ This repository documents the application and its interface. It is not an offer 
 
 ---
 
-*STITMARI — a clearer way to explore real-estate project information.*
+_STITMARI — a clearer way to explore real-estate project information._
