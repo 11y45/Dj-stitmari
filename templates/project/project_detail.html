@@ -426,11 +426,15 @@
         if (!$('#map').data('initialized')) {
             var map = L.map('map').setView([{{ project.map_center.latitude }}, {{ project.map_center.longitude }}], 17);
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-              minZoom: 10, // Minimum zoom level for tiles
-              maxZoom: 17, // Maximum zoom level for tiles
-            }).addTo(map);
-
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    minZoom: 10,
+    maxZoom: 19,
+    referrerPolicy: 'origin',   // <-- ajoute ça
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+setTimeout(function () {
+    map.invalidateSize();
+}, 200);
             // Add the marker
             L.marker([{{ project.map_center.latitude }}, {{ project.map_center.longitude }}]).addTo(map)
                 .bindPopup('{{ project.name }}')
